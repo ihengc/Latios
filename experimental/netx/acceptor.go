@@ -21,7 +21,7 @@ type Acceptor interface {
 	Addr() net.Addr
 	// Close 关闭监听套接字。不会关闭（或清空）已连接队列。
 	// 仅仅停止接收新连接。
-	Close() error
+	Close()
 }
 
 // 每个Acceptor单独运行在goroutine中，关闭则再另一个goroutine中。

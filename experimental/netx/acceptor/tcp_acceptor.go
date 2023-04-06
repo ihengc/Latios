@@ -8,8 +8,8 @@ import "net"
 * @description:
 **/
 
-// tcpAcceptor tcp监听套接字。
-type tcpAcceptor struct {
+// TCPAcceptor tcp监听套接字。
+type TCPAcceptor struct {
 	ln net.Listener
 	// running tcp监听套接字是否运行标识。
 	running bool
@@ -18,7 +18,7 @@ type tcpAcceptor struct {
 }
 
 // ListenAndServe 启动tcp监听。
-func (tc *tcpAcceptor) ListenAndServe() {
+func (tc *TCPAcceptor) ListenAndServe() {
 	// 保证tcp监听套接字正在运行。
 	for tc.running {
 		// TODO accept 调用会发生何种错误，对于特定错误我们需要如何处理？
@@ -31,25 +31,25 @@ func (tc *tcpAcceptor) ListenAndServe() {
 }
 
 // GetConnChan 获取已经建立成功连接只读队列。
-func (tc *tcpAcceptor) GetConnChan() <-chan net.Conn {
+func (tc *TCPAcceptor) GetConnChan() <-chan net.Conn {
 	return tc.connChan
 }
 
 // Addr 获取监听套接字绑定的地址。
-func (tc *tcpAcceptor) Addr() net.Addr {
+func (tc *TCPAcceptor) Addr() net.Addr {
 	return tc.ln.Addr()
 }
 
 // Close 停止接收新连接。
-func (tc *tcpAcceptor) Close() {
+func (tc *TCPAcceptor) Close() {
 	if tc.running {
 		_ = tc.ln.Close()
 		tc.running = false
 	}
 }
 
-// newTCPAcceptor 创建tcp监听套接字。若给定非法地址将返回错误。
-func newTCPAcceptor(network, address string) (*tcpAcceptor, error) {
+// NewTCPAcceptor 创建tcp监听套接字。若给定非法地址将返回错误。
+func NewTCPAcceptor(network, address string) (*TCPAcceptor, error) {
 	addr, err := net.ResolveTCPAddr(network, address)
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func newTCPAcceptor(network, address string) (*tcpAcceptor, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &tcpAcceptor{
+	return &TCPAcceptor{
 		ln:       ln,
 		connChan: make(chan net.Conn, 1),
 	}, nil

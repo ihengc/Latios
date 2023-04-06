@@ -3,6 +3,7 @@ package netx
 import (
 	"errors"
 	"fmt"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
@@ -39,6 +40,8 @@ type Server struct {
 	onExitCallbacks map[string]func()
 	// closeNotify 服务关闭通知通道。由 Shutdown 发送通知。
 	closeNotify chan struct{}
+	frw         FrameReaderWriter
+	sessionMgr  *SessionMgr
 }
 
 func funcWrapper(callback func()) (err error) {
@@ -62,9 +65,23 @@ func (serv *Server) AddAcceptor(acceptor Acceptor) {
 	serv.acceptors = append(serv.acceptors, acceptor)
 }
 
+// processConn 处理客户端连接。
+func (serv *Server) processConn(connChan <-chan net.Conn) {
+	// connChan 中为已经接入的连接。在服务关闭时，关闭刚接入的连接，
+	// 正在接收消息，处理消息，写出消息的连接，应该等待全部消息处理完后
+	// 再关闭处于此状态下的连接（或者清空接收缓冲区中的数据，只等待消息处理
+	// ，写出缓冲区写完）。
+}
+
 // Start 运行服务。
 func (serv *Server) Start() {
 	if serv.servType == Frontend {
+		for _, acceptor := range serv.acceptors {
+			// 当acceptor停止的时候，连接可能要继续被处理。
+			go acceptor.ListenAndServe()
+			connChan := acceptor.GetConnChan()
+			go serv.processConn(connChan)
+		}
 
 	}
 	if serv.servType == Backend {
@@ -77,6 +94,12 @@ func (serv *Server) Start() {
 	case <-serv.closeNotify:
 
 	}
+	// 停止接入客户端连接，
+	for _, acceptor := range serv.acceptors {
+		acceptor.Close()
+	}
+	serv.sessionMgr.CloseAll() // 关闭所有会话。
+	// 执行服务退出前的清理工作。
 	for name, callback := range serv.onExitCallbacks {
 		if err := funcWrapper(callback); err != nil {
 			fmt.Println(fmt.Sprintf("server:invoke callback function %s err %s", name, err.Error()))

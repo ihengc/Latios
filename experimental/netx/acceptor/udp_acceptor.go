@@ -9,8 +9,22 @@ import "net"
 **/
 
 type UDPAcceptor struct {
-	ln      net.Listener
-	running bool
-	// connChan 连接（阻塞）通道。
+	conn     net.Conn
+	running  bool
 	connChan chan net.Conn
+}
+
+func NewUDPAcceptor(network, address string) (*UDPAcceptor, error) {
+	addr, err := net.ResolveUDPAddr(network, address)
+	if err != nil {
+		return nil, err
+	}
+	udpConn, err := net.ListenUDP(network, addr)
+	if err != nil {
+		return nil, err
+	}
+	return &UDPAcceptor{
+		conn:     udpConn,
+		connChan: make(chan net.Conn, 1),
+	}, nil
 }
