@@ -17,19 +17,21 @@ const (
 type FrameType uint8
 
 const (
-	FrameSYN    FrameType = 0x0 // FrameSYN 用来发起连接。
-	FrameACK    FrameType = 0x1 // FrameACK 回应发起连接。
-	FramePing   FrameType = 0x2 // FramePing 心跳数据帧。
-	FrameData   FrameType = 0x3 // FrameData 数据帧。
-	FramePush   FrameType = 0x4 // FramePush 服务主动推送的数据帧。
-	FrameGoAway FrameType = 0x5 // FrameGoAway 服务主动断开连接前发送此数据帧。
+	FrameSYN     FrameType = 0x0 // FrameSYN 用来发起连接。
+	FrameACK     FrameType = 0x1 // FrameACK 回应发起连接。
+	FramePing    FrameType = 0x2 // FramePing 心跳数据帧。
+	FrameData    FrameType = 0x3 // FrameData 数据帧。
+	FramePush    FrameType = 0x4 // FramePush 服务主动推送的数据帧。
+	FrameGoAway  FrameType = 0x5 // FrameGoAway 服务主动断开连接前发送此数据帧。
+	FrameKickOut FrameType = 0x6 // FrameKickOut 踢出用户数据帧。
 )
 
 // Flags 帧标志位类型。
 type Flags uint8
 
 const (
-	FlagPingAck Flags = 0x1 // FlagPingAck ping回应帧。
+	FlagPingAck    Flags = 0x1 // FlagPingAck ping回应帧。
+	FlagFragmented Flags = 0x2 // FlagFragmented 是否是分片帧。
 )
 
 type Frame interface {
@@ -52,6 +54,8 @@ type FrameHeader struct {
 	Timestamp int64
 	// Flag 帧标志位。
 	Flag Flags
+	// FragmentOffSet 分片偏移。
+	FragmentOffSet uint32
 }
 
 // DataFrame 数据帧。
@@ -81,7 +85,11 @@ type FrameReaderWriter struct {
 	writeBuf []byte
 }
 
-// readFrameHeader 读取帧头部。
-func readFrameHeader(b []byte, r io.Reader) (FrameHeader, error) {
-	return FrameHeader{}, nil
+// ReadFrame 读取帧。
+func (frw *FrameReaderWriter) ReadFrame() ([]Frame, error) {
+	// 读取帧的头部。
+	if _, err := io.ReadFull(frw.r, frw.headerBuf[:]); err != nil {
+		return nil, err
+	}
+	return nil, nil
 }
