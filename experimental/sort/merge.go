@@ -8,7 +8,7 @@ package sort
 
 // 本文件对归并排序算法进行描述分析和实现。
 
-// MergeSort 归并排序
+// MergeSort 归并排序。
 // low 为子集合的下界，high为子集合的上界。
 func MergeSort(x []int, low, high int) {
 	if low >= high {
@@ -21,6 +21,8 @@ func MergeSort(x []int, low, high int) {
 }
 
 func merge(x []int, low int, middle int, high int) {
+	// 数组x分解已经被分解为两个有序子集合[low, middle],[middle+1, high]
+	// 合并两个有序子集合[low, middle]和[middle+1, high]
 	tLow := low
 	tMiddle := middle + 1
 	tX := make([]int, 0)
