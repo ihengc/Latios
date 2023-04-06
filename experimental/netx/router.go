@@ -18,4 +18,5 @@ type RouteIDType uint32
 type LocalHandlerFunc func(c *Context)
 
 type Router struct {
+	routes map[*Route]LocalHandlerFunc
 }
