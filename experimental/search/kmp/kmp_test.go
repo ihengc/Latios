@@ -12,6 +12,29 @@ import (
 
 func TestKMP(t *testing.T) {
 	testSearch(t)
+	testKMPSearch(t)
+}
+
+// kmp子字符串查找测试。
+func testKMPSearch(t *testing.T) {
+	txt := "name"
+	pat := "nam"
+	ret := Search(pat, txt)
+	if ret != 0 {
+		t.Fatal("kmp search error")
+	}
+	txt = "xName"
+	pat = "me"
+	ret = Search(pat, txt)
+	if ret != 3 {
+		t.Fatal("kmp search error")
+	}
+	txt = "xName"
+	pat = "jack"
+	ret = Search(pat, txt)
+	if ret != -1 {
+		t.Fatal("kmp search error")
+	}
 }
 
 // 暴力查找测试。
