@@ -1,4 +1,4 @@
-package sort
+package insertion
 
 /*
 * @author: Chen Chiheng

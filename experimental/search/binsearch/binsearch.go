@@ -1,4 +1,4 @@
-package search
+package binsearch
 
 /*
 * @author: Chen Chiheng
