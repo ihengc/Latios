@@ -7,20 +7,16 @@ package bm
  */
 
 func Search(pat string, txt string) int {
+	pLen := len(pat)
+	tLen := len(txt)
 	pMap := make(map[byte]int)
-	for i := 0; i < len(pat); i++ {
+	for i := 0; i < pLen; i++ {
 		pMap[pat[i]] = i
 	}
-	tIndex := 0
-	pIndex := len(pat) - 1
-	// 从右向左开始比较，若出现字符不同的情况：
-	// 先确定文本字符是否在模式字符串中存在，再确定最右边文本字符的位置。
-	for pIndex >= 0 {
-		if pat[pIndex] == txt[tIndex+len(pat)] {
-
-		} else {
-			if skip, ok := pMap[pat[pIndex]]; ok {
-				tIndex += len(pat) - skip
+	skip := 0
+	for i := 0; i < tLen-pLen; i += skip {
+		for j := pLen - 1; j >= 0; j-- {
+			if pat[j] == txt[i+j] {
 			}
 		}
 	}
